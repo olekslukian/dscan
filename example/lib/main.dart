@@ -32,13 +32,18 @@ class _MyAppState extends State<MyApp> {
       loading = true;
     });
 
-    final image = await imagePicker.pickImage(source: ImageSource.gallery);
-    final bytes = await image?.readAsBytes();
-
-    setState(() {
-      imageBytes = bytes;
-      loading = false;
-    });
+    try {
+      final image = await imagePicker.pickImage(source: ImageSource.gallery);
+      final bytes = await image?.readAsBytes();
+      setState(() {
+        imageBytes = bytes ?? imageBytes;
+        loading = false;
+      });
+    } catch (_) {
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   Future<void> _grayscaleImage(Uint8List bytes) async {
@@ -61,22 +66,30 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(title: const Text('Image grayscale')),
         body: Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Column(
-            children: [
-              Expanded(
-                child: switch (loading) {
-                  true => Center(child: CircularProgressIndicator()),
-                  false when imageBytes != null => Image.memory(imageBytes!),
-                  _ => Center(child: Text('No image selected')),
-                },
-              ),
-              ElevatedButton(onPressed: _pickImage, child: Text('Pick image')),
-              if (imageBytes != null)
-                ElevatedButton(
-                  onPressed: () => _grayscaleImage(imageBytes!),
-                  child: Text('Make grayscale'),
+          child: Center(
+            child: Column(
+              children: [
+                Expanded(
+                  child: switch (loading) {
+                    true => Center(child: CircularProgressIndicator()),
+                    false when imageBytes != null => Image.memory(imageBytes!),
+                    _ => Center(child: Text('No image selected')),
+                  },
                 ),
-            ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
+                  child: ElevatedButton(
+                    onPressed: _pickImage,
+                    child: Text('Pick image'),
+                  ),
+                ),
+                if (imageBytes != null)
+                  ElevatedButton(
+                    onPressed: () => _grayscaleImage(imageBytes!),
+                    child: Text('Make grayscale'),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
