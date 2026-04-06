@@ -1,92 +1,39 @@
 # dscan
 
-A new Flutter FFI plugin project.
+A high-performance Flutter package for document scanning. This project leverages `flutter_rust_bridge` to execute native Rust code and utilizes OpenCV for core image processing.
 
-## Getting Started
+## Prerequisites
 
-This project is a starting point for a Flutter
-[FFI plugin](https://flutter.dev/to/ffi-package),
-a specialized package that includes native code directly invoked with Dart FFI.
+### macOS
+If you are developing or running the application for the macOS desktop target, OpenCV must be installed locally via Homebrew:
 
-## Project structure
-
-This template uses the following structure:
-
-* `src`: Contains the native source code, and a CmakeFile.txt file for building
-  that source code into a dynamic library.
-
-* `lib`: Contains the Dart code that defines the API of the plugin, and which
-  calls into the native code using `dart:ffi`.
-
-* platform folders (`android`, `ios`, `windows`, etc.): Contains the build files
-  for building and bundling the native code library with the platform application.
-
-## Building and bundling native code
-
-The `pubspec.yaml` specifies FFI plugins as follows:
-
-```yaml
-  plugin:
-    platforms:
-      some_platform:
-        ffiPlugin: true
+```bash
+brew install opencv
 ```
 
-This configuration invokes the native build for the various target platforms
-and bundles the binaries in Flutter applications using these FFI plugins.
+### iOS and Android
+No manual installation is required. The provided build scripts will automatically download and link the official pre-compiled OpenCV SDKs for mobile platforms.
 
-This can be combined with dartPluginClass, such as when FFI is used for the
-implementation of one platform in a federated plugin:
+### How to Run
+To ensure all C++ dependencies are properly downloaded and linked before compilation, always use the included run.sh wrapper script instead of the standard flutter run command.
 
-```yaml
-  plugin:
-    implements: some_other_plugin
-    platforms:
-      some_platform:
-        dartPluginClass: SomeClass
-        ffiPlugin: true
+First, ensure the scripts have execution permissions (you only need to do this once):
+
+```bash
+chmod +x run.sh scripts/setup_opencv.sh
 ```
 
-A plugin can have both FFI and method channels:
+Then, execute the wrapper script and specify your target device:
 
-```yaml
-  plugin:
-    platforms:
-      some_platform:
-        pluginClass: SomeName
-        ffiPlugin: true
+```bash
+# To run on macOS (relies on Homebrew)
+./run.sh -d macos
+
+# To run on iOS (automatically downloads opencv2.xcframework)
+./run.sh -d ios
+
+# To run on Android (automatically downloads OpenCV-android-sdk)
+./run.sh -d android
 ```
 
-The native build systems that are invoked by FFI (and method channel) plugins are:
-
-* For Android: Gradle, which invokes the Android NDK for native builds.
-  * See the documentation in android/build.gradle.
-* For iOS and MacOS: Xcode, via CocoaPods.
-  * See the documentation in ios/dscan.podspec.
-  * See the documentation in macos/dscan.podspec.
-* For Linux and Windows: CMake.
-  * See the documentation in linux/CMakeLists.txt.
-  * See the documentation in windows/CMakeLists.txt.
-
-## Binding to native code
-
-To use the native code, bindings in Dart are needed.
-To avoid writing these by hand, they are generated from the header file
-(`src/dscan.h`) by `package:ffigen`.
-Regenerate the bindings by running `dart run ffigen --config ffigen.yaml`.
-
-## Invoking native code
-
-Very short-running native functions can be directly invoked from any isolate.
-For example, see `sum` in `lib/dscan.dart`.
-
-Longer-running functions should be invoked on a helper isolate to avoid
-dropping frames in Flutter applications.
-For example, see `sumAsync` in `lib/dscan.dart`.
-
-## Flutter help
-
-For help getting started with Flutter, view our
-[online documentation](https://docs.flutter.dev), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
+If you need to pass additional Flutter arguments, simply append them to the script.
