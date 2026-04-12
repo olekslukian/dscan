@@ -23,6 +23,11 @@ if [ "$PLATFORM_FLAG" == "--ios" ]; then
     ./scripts/setup_opencv.sh --ios
 elif [ "$PLATFORM_FLAG" == "--android" ]; then
     ./scripts/setup_opencv.sh --android
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    OPENCV_SDK="$SCRIPT_DIR/third_party/opencv/android/OpenCV-android-sdk/sdk/native"
+    export OPENCV_LINK_LIBS=opencv_java4
+    export OPENCV_LINK_PATHS="$OPENCV_SDK/libs/arm64-v8a"
+    export OPENCV_INCLUDE_PATHS="$OPENCV_SDK/jni/include"
 elif [ "$PLATFORM_FLAG" == "--macos" ]; then
     echo "-- macOS target detected: Relying on Homebrew OpenCV. Skipping downloads. --"
 else

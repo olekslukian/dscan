@@ -1,9 +1,5 @@
 use anyhow::Result;
-use opencv::{
-    core::{self, AlgorithmHint},
-    imgcodecs, imgproc,
-    prelude::*,
-};
+use opencv::{core, imgcodecs, imgproc, prelude::*};
 
 pub fn make_grayscale(image_bytes: Vec<u8>) -> Result<Vec<u8>> {
     let src = imgcodecs::imdecode(
@@ -13,13 +9,7 @@ pub fn make_grayscale(image_bytes: Vec<u8>) -> Result<Vec<u8>> {
 
     let mut gray = core::Mat::default();
 
-    imgproc::cvt_color(
-        &src,
-        &mut gray,
-        imgproc::COLOR_BGR2GRAY,
-        0,
-        AlgorithmHint::ALGO_HINT_DEFAULT,
-    )?;
+    imgproc::cvt_color_def(&src, &mut gray, imgproc::COLOR_BGR2GRAY)?;
 
     let mut result_bytes = core::Vector::<u8>::new();
     imgcodecs::imencode(".jpg", &gray, &mut result_bytes, &core::Vector::new())?;

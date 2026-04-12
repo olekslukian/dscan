@@ -44,6 +44,12 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    sourceSets {
+        main {
+            jniLibs.srcDirs += ["../third_party/opencv/android/OpenCV-android-sdk/sdk/native/libs"]
+        }
+    }
+
     defaultConfig {
         minSdkVersion 19
     }

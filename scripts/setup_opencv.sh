@@ -2,7 +2,7 @@
 
 set -e
 
-OPENCV_VERSION="4.10.0"
+OPENCV_VERSION="4.13.0"
 THIRD_PARTY_DIR="third_party/opencv"
 
 IOS_URL="https://github.com/opencv/opencv/releases/download/${OPENCV_VERSION}/opencv-${OPENCV_VERSION}-ios-framework.zip"
@@ -36,7 +36,7 @@ mkdir -p "$THIRD_PARTY_DIR/android"
 # iOS
 # ---------------------------------------------------------
 if [ "$CHECK_IOS" = true ]; then
-    if [ -d "$THIRD_PARTY_DIR/ios/opencv2.xcframework" ]; then
+    if [ -d "$THIRD_PARTY_DIR/ios/opencv2.framework" ]; then
         echo "-- iOS OpenCV framework found. --"
     else
         echo "-- iOS OpenCV framework missing. Downloading version $OPENCV_VERSION... -- "

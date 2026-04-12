@@ -4,7 +4,6 @@ use std::path::PathBuf;
 fn main() {
     let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
     let target_arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
-    let target = env::var("TARGET").unwrap();
     let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
 
     let third_party_dir = PathBuf::from(manifest_dir).join("../third_party/opencv");
@@ -16,22 +15,24 @@ fn main() {
         println!("cargo:rustc-link-lib=opencv_imgcodecs");
         println!("cargo:rustc-link-lib=opencv_videoio");
     } else if target_os == "ios" {
-        let xcframework_dir = third_party_dir.join("ios/opencv2.framework");
-
-        let slice = if target.ends_with("-ios-sim") || target.starts_with("x86_64-apple-ios") {
-            "ios-arm64_x86_64-simulator"
-        } else {
-            "ios-arm64"
-        };
-
-        let framework_path = xcframework_dir.join(slice);
+        let framework_search_path = third_party_dir.join("ios");
 
         println!(
             "cargo:rustc-link-search=framework={}",
-            framework_path.display()
+            framework_search_path.display()
         );
         println!("cargo:rustc-link-lib=framework=opencv2");
         println!("cargo:rustc-link-lib=c++");
+
+        println!("cargo:rustc-link-lib=framework=AVFoundation");
+        println!("cargo:rustc-link-lib=framework=CoreMedia");
+        println!("cargo:rustc-link-lib=framework=CoreVideo");
+        println!("cargo:rustc-link-lib=framework=CoreGraphics");
+        println!("cargo:rustc-link-lib=framework=Accelerate");
+        println!("cargo:rustc-link-lib=framework=OpenGLES");
+        println!("cargo:rustc-link-lib=framework=QuartzCore");
+        println!("cargo:rustc-link-lib=framework=UIKit");
+        println!("cargo:rustc-link-lib=framework=Foundation");
     } else if target_os == "android" {
         let jni_arch = match target_arch.as_str() {
             "aarch64" => "arm64-v8a",
@@ -47,7 +48,6 @@ fn main() {
         ));
 
         println!("cargo:rustc-link-search={}", android_libs.display());
-
         println!("cargo:rustc-link-lib=opencv_java4");
     }
 }
