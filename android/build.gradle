@@ -55,6 +55,34 @@ android {
     }
 }
 
+android.libraryVariants.all { variant ->
+    def variantName = variant.name.capitalize()
+    def copyTask = tasks.register("copyLibcpp${variantName}") {
+        doLast {
+            def ndkDir = android.ndkDirectory
+            def sysroot = "$ndkDir/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib"
+            [
+                "arm64-v8a"   : "aarch64-linux-android",
+                "armeabi-v7a" : "arm-linux-androideabi",
+                "x86"         : "i686-linux-android",
+                "x86_64"      : "x86_64-linux-android"
+            ].each { abi, triple ->
+                def src = file("$sysroot/$triple/libc++_shared.so")
+                def dst = file("$buildDir/libc++/$abi")
+                dst.mkdirs()
+                copy {
+                    from src
+                    into dst
+                }
+            }
+        }
+    }
+    variant.packageLibraryProvider.configure { it.dependsOn(copyTask) }
+    tasks.named("merge${variantName}JniLibFolders").configure { it.dependsOn(copyTask) }
+}
+
+android.sourceSets.main.jniLibs.srcDirs += ["$buildDir/libc++"]
+
 apply from: "../cargokit/gradle/plugin.gradle"
 cargokit {
     manifestDir = "../rust"
