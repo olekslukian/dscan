@@ -46,7 +46,7 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  Future<void> _grayscaleImage(Uint8List bytes) async {
+  Future<void> _processImage(Uint8List bytes) async {
     setState(() {
       loading = true;
     });
@@ -85,7 +85,7 @@ class _MyAppState extends State<MyApp> {
                 ),
                 if (imageBytes != null)
                   ElevatedButton(
-                    onPressed: () => _grayscaleImage(imageBytes!),
+                    onPressed: () => _processImage(imageBytes!),
                     child: Text('Process image'),
                   ),
               ],

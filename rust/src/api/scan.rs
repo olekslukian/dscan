@@ -19,7 +19,11 @@ pub fn process_document(image_bytes: Vec<u8>) -> Result<Vec<u8>> {
 
     let mut result_bytes = core::Vector::<u8>::new();
 
-    imgcodecs::imencode(".jpg", &blurred, &mut result_bytes, &core::Vector::new())?;
+    let mut edges = core::Mat::default();
+
+    imgproc::canny_def(&blurred, &mut edges, 75.0, 200.0)?;
+
+    imgcodecs::imencode(".jpg", &edges, &mut result_bytes, &core::Vector::new())?;
 
     Ok(result_bytes.to_vec())
 }
