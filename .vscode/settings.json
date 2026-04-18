@@ -1,0 +1,6 @@
+{
+  "rust-analyzer.server.extraEnv": {
+    "PATH": "/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+    "PKG_CONFIG_PATH": "/opt/homebrew/opt/opencv/lib/pkgconfig"
+  }
+}

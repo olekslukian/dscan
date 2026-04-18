@@ -51,7 +51,7 @@ class _MyAppState extends State<MyApp> {
       loading = true;
     });
 
-    final grayscaleBytes = await makeGrayscale(imageBytes: bytes.toList());
+    final grayscaleBytes = await processDocument(imageBytes: bytes.toList());
 
     setState(() {
       imageBytes = grayscaleBytes;
@@ -63,7 +63,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: const Text('Image grayscale')),
+        appBar: AppBar(title: const Text('Image processing')),
         body: Padding(
           padding: const EdgeInsets.symmetric(vertical: 24),
           child: Center(
@@ -86,7 +86,7 @@ class _MyAppState extends State<MyApp> {
                 if (imageBytes != null)
                   ElevatedButton(
                     onPressed: () => _grayscaleImage(imageBytes!),
-                    child: Text('Make grayscale'),
+                    child: Text('Process image'),
                   ),
               ],
             ),

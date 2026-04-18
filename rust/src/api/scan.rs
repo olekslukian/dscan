@@ -1,7 +1,7 @@
 use anyhow::Result;
 use opencv::{core, imgcodecs, imgproc, prelude::*};
 
-pub fn make_grayscale(image_bytes: Vec<u8>) -> Result<Vec<u8>> {
+pub fn process_document(image_bytes: Vec<u8>) -> Result<Vec<u8>> {
     let src = imgcodecs::imdecode(
         &core::Vector::from_slice(&image_bytes),
         imgcodecs::IMREAD_COLOR,
@@ -11,8 +11,15 @@ pub fn make_grayscale(image_bytes: Vec<u8>) -> Result<Vec<u8>> {
 
     imgproc::cvt_color_def(&src, &mut gray, imgproc::COLOR_BGR2GRAY)?;
 
+    let ksize = core::Size::new(5, 5);
+
+    let mut blurred = core::Mat::default();
+
+    imgproc::gaussian_blur_def(&gray, &mut blurred, ksize, 0.0)?;
+
     let mut result_bytes = core::Vector::<u8>::new();
-    imgcodecs::imencode(".jpg", &gray, &mut result_bytes, &core::Vector::new())?;
+
+    imgcodecs::imencode(".jpg", &blurred, &mut result_bytes, &core::Vector::new())?;
 
     Ok(result_bytes.to_vec())
 }

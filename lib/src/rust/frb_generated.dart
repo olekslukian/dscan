@@ -66,7 +66,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => 1334782776;
+  int get rustContentHash => 39562969;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -79,7 +79,9 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 abstract class RustLibApi extends BaseApi {
   Future<void> crateApiScanInitApp();
 
-  Future<Uint8List> crateApiScanMakeGrayscale({required List<int> imageBytes});
+  Future<Uint8List> crateApiScanProcessDocument({
+    required List<int> imageBytes,
+  });
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -118,7 +120,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "init_app", argNames: []);
 
   @override
-  Future<Uint8List> crateApiScanMakeGrayscale({required List<int> imageBytes}) {
+  Future<Uint8List> crateApiScanProcessDocument({
+    required List<int> imageBytes,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -135,17 +139,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
           decodeErrorData: sse_decode_AnyhowException,
         ),
-        constMeta: kCrateApiScanMakeGrayscaleConstMeta,
+        constMeta: kCrateApiScanProcessDocumentConstMeta,
         argValues: [imageBytes],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiScanMakeGrayscaleConstMeta => const TaskConstMeta(
-    debugName: "make_grayscale",
-    argNames: ["imageBytes"],
-  );
+  TaskConstMeta get kCrateApiScanProcessDocumentConstMeta =>
+      const TaskConstMeta(
+        debugName: "process_document",
+        argNames: ["imageBytes"],
+      );
 
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw) {

@@ -6,5 +6,5 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<Uint8List> makeGrayscale({required List<int> imageBytes}) =>
-    RustLib.instance.api.crateApiScanMakeGrayscale(imageBytes: imageBytes);
+Future<Uint8List> processDocument({required List<int> imageBytes}) =>
+    RustLib.instance.api.crateApiScanProcessDocument(imageBytes: imageBytes);
