@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
+import 'package:dscan_example/edges_painer.dart';
 import 'package:flutter/material.dart';
 import 'package:dscan/dscan.dart';
 import 'package:image_picker/image_picker.dart';
@@ -19,8 +21,10 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final imagePicker = ImagePicker();
+  List<DocPoint> documentEdges = [];
   bool loading = false;
   Uint8List? imageBytes;
+  ui.Image? decodedImage;
 
   @override
   void initState() {
@@ -35,10 +39,21 @@ class _MyAppState extends State<MyApp> {
     try {
       final image = await imagePicker.pickImage(source: ImageSource.gallery);
       final bytes = await image?.readAsBytes();
-      setState(() {
-        imageBytes = bytes ?? imageBytes;
-        loading = false;
-      });
+
+      if (bytes != null) {
+        final decoded = await decodeImageFromList(bytes);
+
+        setState(() {
+          imageBytes = bytes;
+          decodedImage = decoded;
+          documentEdges = [];
+          loading = false;
+        });
+      } else {
+        setState(() {
+          loading = false;
+        });
+      }
     } catch (_) {
       setState(() {
         loading = false;
@@ -46,15 +61,17 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  Future<void> _processImage(Uint8List bytes) async {
+  Future<void> _detectEdges(Uint8List bytes) async {
     setState(() {
       loading = true;
     });
 
-    final grayscaleBytes = await processDocument(imageBytes: bytes.toList());
+    final points = await detectDocumentEdges(imageBytes: bytes.toList());
+
+    print(points);
 
     setState(() {
-      imageBytes = grayscaleBytes;
+      documentEdges = points;
       loading = false;
     });
   }
@@ -71,8 +88,25 @@ class _MyAppState extends State<MyApp> {
               children: [
                 Expanded(
                   child: switch (loading) {
-                    true => Center(child: CircularProgressIndicator()),
-                    false when imageBytes != null => Image.memory(imageBytes!),
+                    true => const Center(child: CircularProgressIndicator()),
+                    false when imageBytes != null && decodedImage != null =>
+                      FittedBox(
+                        fit: BoxFit.contain,
+                        child: SizedBox(
+                          width: decodedImage?.width.toDouble(),
+                          height: decodedImage?.height.toDouble(),
+                          child: Stack(
+                            children: [
+                              Image.memory(imageBytes!),
+                              Positioned.fill(
+                                child: CustomPaint(
+                                  painter: EdgesPainter(documentEdges),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     _ => Center(child: Text('No image selected')),
                   },
                 ),
@@ -85,7 +119,7 @@ class _MyAppState extends State<MyApp> {
                 ),
                 if (imageBytes != null)
                   ElevatedButton(
-                    onPressed: () => _processImage(imageBytes!),
+                    onPressed: () => _detectEdges(imageBytes!),
                     child: Text('Process image'),
                   ),
               ],

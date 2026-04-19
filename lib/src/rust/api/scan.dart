@@ -6,5 +6,25 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<Uint8List> processDocument({required List<int> imageBytes}) =>
-    RustLib.instance.api.crateApiScanProcessDocument(imageBytes: imageBytes);
+Future<List<DocPoint>> detectDocumentEdges({required List<int> imageBytes}) =>
+    RustLib.instance.api.crateApiScanDetectDocumentEdges(
+      imageBytes: imageBytes,
+    );
+
+class DocPoint {
+  final double x;
+  final double y;
+
+  const DocPoint({required this.x, required this.y});
+
+  @override
+  int get hashCode => x.hashCode ^ y.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DocPoint &&
+          runtimeType == other.runtimeType &&
+          x == other.x &&
+          y == other.y;
+}
